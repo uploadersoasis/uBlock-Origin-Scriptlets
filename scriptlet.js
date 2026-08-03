@@ -5,10 +5,7 @@
 //  example.com##+js(override-let-func, window.alert)
 //'use strict';
 function overrideletfunc(selector = '') {
-    selector = '{{1}}'; // e.g., "calculateArea2"
-    // Checks if the argument was left empty or wasn't provided at all
-    //if (!selector || selector === '{{1}}') { return; }
-    runAt(( ) => {
+    runAt(() => {
         try {
             const scriptElem = document.createElement('script');
             // Constructs and injects raw script into the page root scope
