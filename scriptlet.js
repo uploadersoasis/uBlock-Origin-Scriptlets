@@ -25,4 +25,5 @@ function override-let-func (targetName = '') {
     } catch (err) {
         console.err(err?.message);
     }
-})();
+}
+
