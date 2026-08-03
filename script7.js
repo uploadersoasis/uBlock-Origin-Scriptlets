@@ -5,7 +5,7 @@ function overrideletfunc(selector = 'testing') {
     const hook = () => {
         try {
             if (arguments) {
-               console.info(`Argument 1 is [arguments[0].`);
+               console.info(`Argument 1 is ${[arguments[0]}.`);
             }
         } catch (err) {
             console.error('[uBO override-let-func]', err);
