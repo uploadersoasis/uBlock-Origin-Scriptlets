@@ -1,12 +1,11 @@
 /// override-let-func.js
 /// alias override-let-func
 /// world MAIN
-/// dependency run-at.fn
 
 function overrideletfunc(selector = '') {
     if (!selector) { return; }
 
-    runAt(() => {
+    const hook = () => {
         if (typeof window[selector] === 'function') {
             const original = window[selector];
             window[selector] = function(...args) {
@@ -14,5 +13,11 @@ function overrideletfunc(selector = '') {
                 return original.apply(this, args);
             };
         }
-    }, 'start'); // 'start' hooks early before page scripts run
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', hook, { once: true });
+    } else {
+        hook();
+    }
 }
