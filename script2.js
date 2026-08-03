@@ -2,17 +2,24 @@
 /// alias override-let-func
 /// world MAIN
 function overrideletfunc(selector = '') {
-    try {
-        if {calculateArea || calculareArea !== "undefined"}
-           calculateArea=()=>{};
+    const hook = () => {
+        try {
+            if {calculateArea || calculareArea !== "undefined"}
+               calculateArea=()=>{};
+            }
+            calculateArea();
+            window.calculateArea2();
+            console.log(`Hey bitch, it's ${window.calculateArea?.name}!`);
+            console.log(`Hey bitch, it's ${window.calculateArea2?.name}!`);
+            console.log(`Hey bitch, it's ${calculateArea?.name}!`);
+            console.log(`Hey bitch, it's ${calculateArea2?.name}!`);
+        } catch(err) {
+            console.error(err?.message);
         }
-        calculateArea();
-        window.calculateArea2();
-        console.log(`Hey bitch, it's ${window.calculateArea?.name}!`);
-        console.log(`Hey bitch, it's ${window.calculateArea2?.name}!`);
-        console.log(`Hey bitch, it's ${calculateArea?.name}!`);
-        console.log(`Hey bitch, it's ${calculateArea2?.name}!`);
-    } catch(err) {
-        console.error(err?.message);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', hook, { once: true });
+    } else {
+        hook();
     }
 }
