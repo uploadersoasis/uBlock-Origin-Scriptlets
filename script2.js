@@ -2,8 +2,13 @@
 /// alias override-let-func
 /// world MAIN
 function overrideletfunc(selector = '') {
-    console.log(`Hey bitch, it's ${calculateArea2?.name}!`);
-    calculateArea=()=>{};
-    calculateArea();
-    window.calculateArea2();
+    try {
+        calculateArea=()=>{};
+        calculateArea();
+        window.calculateArea2();
+        console.log(`Hey bitch, it's ${calculateArea?.name}!`);
+        console.log(`Hey bitch, it's ${calculateArea2?.name}!`);
+    } catch(err) {
+        console.error(err?.message);
+    }
 }
