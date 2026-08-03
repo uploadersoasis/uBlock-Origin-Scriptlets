@@ -22,12 +22,12 @@ function overrideFunctionBody(selector, ...extraArgs) {
 	// Do NOT use quotations inside the function body text IF the text is enclosed in quotation marks for the parameter/uBlock Origin rule, e.g. firefox.localhost##+js(override-function-body, calculateArea, "console.log("It works!");", true), since that triggers "SyntaxError: unexpected token: identifier".
     const rawReplacement = extraArgs.join(',').trim();  // no need to escape commas since it strips them
     // Substitute the generated backup variable name for the "<backup>" placeholder if it is contained in the replacement body.
-    // "<backup>" must be surrounded by a space, linefeed, or select syntax characters or be at the end or beginning of the body text.
+    // "<backup>" must be surrounded by a space, linefeed, or select Javascript syntax characters or be at the end or beginning of the body text.
     // Otherwise fallback to calling the backup variable if it is a function or return it as-is if a value.
     // Unless saved to a globally scoped object or variable, the backup function can't be accessed or modified for reuse, and it will be lost if the replacement function gets overridden later by scripts used by the webpage to which this scriptlet is applied.
 	// backupVar is not returned (appended to replacementCode automatically) if rawReplacement is provided.
     const replacementCode = rawReplacement
-        ? rawReplacement.replace(/(?<=[\s;\,\{\}\[\]]|^)<backup>(?=[\s;\.\,\{\}\[\]]|$)/g, backupVar)
+        ? rawReplacement.replace(/(?<=[\s;\,\{\}\[\]\(\)]|^)<backup>(?=[\s;\.\,\{\}\[\]\(\)]|$)/g, backupVar)
         : `return typeof ${backupVar} === "function" ? ${backupVar}.apply(this, args) : ${backupVar};`;
     const applyHook = () => {
         try {// create the replacement function from a string of raw code
