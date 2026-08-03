@@ -7,7 +7,7 @@
 function overrideletfunc(selector = '') {
     selector = '{{1}}'; // e.g., "calculateArea2"
     // Checks if the argument was left empty or wasn't provided at all
-    if (!selector || selector === '{{1}}') { return; }
+    //if (!selector || selector === '{{1}}') { return; }
     runAt(( ) => {
         try {
             const scriptElem = document.createElement('script');
