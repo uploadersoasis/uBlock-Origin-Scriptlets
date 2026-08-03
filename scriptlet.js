@@ -4,8 +4,8 @@
 /// alias override-let-func
 /// world ISOLATED
 //  example.com##+js(override-let-func, window.alert)
-(function() {
-    const targetName = '{{1}}'; // e.g., "calculateArea"
+function override-let-func (targetName = '') {
+    targetName = '{{1}}'; // e.g., "calculateArea"
 // Checks if the argument was left empty or wasn't provided at all
     if (!targetName || targetName === '{{1}}') { return; }
     try {
