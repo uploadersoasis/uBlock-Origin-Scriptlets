@@ -7,33 +7,10 @@ function overrideletfunc(selector = '') {
 
     const hook = () => {
         try {
-            // 1. Check window property
-            if (typeof window[selector] === 'function') {
-                const original = window[selector];
-                window[selector] = function(...args) {
-                    console.log(`[uBO Intercept] ${selector}:`, args);
-                    return original.apply(this, args);
-                };
-                return;
-            }
-
-            // 2. Direct global scope mutation via top-level Function execution
-            const interceptor = new Function(`
-                try {
-                    if (typeof ${selector} !== 'undefined') {
-                        const original = ${selector};
-                        ${selector} = function(...args) {
-                            console.log('[uBO Intercept] ${selector}:', args);
-                            return original.apply(this, args);
-                        };
-                    }
-                } catch (e) {
-                    console.error('[uBO override-let-func]', e);
-                }
-            `);
-            interceptor();
+            // Direct global assignment on the selector parameter passed by uBO
+            new Function(`${selector} = function(...args) { console.log('[uBO Intercept]', args); };`)();
         } catch (err) {
-            console.error(`[uBO override-let-func] Error on ${selector}:`, err?.message);
+            console.error('[uBO override-let-func]', err);
         }
     };
 
