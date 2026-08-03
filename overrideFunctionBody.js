@@ -19,11 +19,13 @@ function overrideFunctionBody(selector, ...extraArgs) {
     const backupVar = `${selector}Original`;
     // .join() always returns a string.
     // Treat all of extraArgs as the replacement body text string so putting the body in quotations is not required.
+	// Do NOT use quotations inside the function body text IF the text is enclosed in quotation marks for the parameter/uBlock Origin rule, e.g. firefox.localhost##+js(override-function-body, calculateArea, "console.log("It works!");", true), since that triggers "SyntaxError: unexpected token: identifier".
     const rawReplacement = extraArgs.join(',').trim();  // no need to escape commas since it strips them
-    // Substitute the "<backup>" placeholder if contained in the replacement body; otherwise fallback to calling the backup function
+    // Substitute the generated backup variable name for the "<backup>" placeholder if it is contained in the replacement body.
     // "<backup>" must be surrounded by a space or linefeed or be at the end or beginning of the body text.
-    // call the backup if a function or return it if a value
+    // Otherwise fallback to calling the backup variable if it is a function or return it as-is if a value.
     // Unless saved to a globally scoped object or variable, the backup function can't be accessed or modified for reuse, and it will be lost if the replacement function gets overridden later by scripts used by the webpage to which this scriptlet is applied.
+	// backupVar is not returned (appended to replacementCode automatically) if rawReplacement is provided.
     const replacementCode = rawReplacement
         ? rawReplacement.replace(/(?<=\s|^)<backup>(?=\s|$)/g, backupVar)
         : `return typeof ${backupVar} === "function" ? ${backupVar}.apply(this, args) : ${backupVar};`;
@@ -33,7 +35,7 @@ function overrideFunctionBody(selector, ...extraArgs) {
                 try {
                     // Check window property, e.g. "var calculateArea2".
                     if (typeof window['${selector}'] !== 'undefined') {// TODO: assumes selector is a single keyword
-                        const ${backupVar} = window['${selector}'];  // backup the function
+                        const ${backupVar} = window['${selector}'];  // backup the function to local scope
                         const hookFn = function(...args) {// override the function
                             console.info('[uBO] ${selector}:', args);
                             ${replacementCode}
@@ -57,7 +59,7 @@ function overrideFunctionBody(selector, ...extraArgs) {
                     }
                     // Handle top-level lexical variable, e.g. "let calculateArea"; cannot provide write-protect
                     if (typeof ${selector} !== 'undefined') {
-                        const ${backupVar} = ${selector};  // backup the function
+                        const ${backupVar} = ${selector};  // backup the function to local scope
                         ${selector} = function(...args) {// override the function
                             console.info('[uBO Intercept] ${selector}:', args);
                             ${replacementCode}
