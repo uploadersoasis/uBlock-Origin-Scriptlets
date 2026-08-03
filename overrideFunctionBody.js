@@ -1,29 +1,66 @@
 /// override-function-body.js
 /// alias override-function-body
 /// world MAIN
-function overrideFunctionBody(selector) {
+function overrideFunctionBody(selector, ...extraArgs) {
     if (!selector) { return; }
+    // Check if the final argument passed from uBO is a boolean toggle
+    let writeProtect = true;  // default value if unspecified
+    // extraArgs is always an array and always empty if there are no entered arguments for it.
+    if (extraArgs.length > 0) {
+        const lastArg = String(extraArgs[extraArgs.length - 1]).trim().toLowerCase();
+        if (lastArg === 'false') {
+            writeProtect = false;
+            extraArgs.pop();  // remove the last argument
+        } else if (lastArg === 'true') {
+            writeProtect = true;
+            extraArgs.pop();  // remove the last argument
+        }
+    }
+    const backupVar = `${selector}Original`;
+    // .join() always returns a string.
+    // Treat all of extraArgs as the replacement body text string so putting the body in quotations is not required.
+    const rawReplacement = extraArgs.join(',').trim();  // no need to escape commas since it strips them
+    // Substitute the "<backup>" placeholder if contained in the replacement body; otherwise fallback to calling the backup function
+    // "<backup>" must be surrounded by a space or linefeed or be at the end or beginning of the body text.
+    // call the backup if a function or return it if a value
+    // Unless saved to a globally scoped object or variable, the backup function can't be accessed or modified for reuse, and it will be lost if the replacement function gets overridden later by scripts used by the webpage to which this scriptlet is applied.
+    const replacementCode = rawReplacement
+        ? rawReplacement.replace(/(?<=\s|^)<backup>(?=\s|$)/g, backupVar)
+        : `return typeof ${backupVar} === "function" ? ${backupVar}.apply(this, args) : ${backupVar};`;
     const applyHook = () => {
-        try {
+        try {// create the replacement function from a string of raw code
             new Function(`
                 try {
-                    // Check window property (e.g., var calculateArea2)
+                    // Check window property, e.g. "var calculateArea2".
                     if (typeof window['${selector}'] !== 'undefined') {// TODO: assumes selector is a single keyword
-                        const ${selector}Original = window['${selector}'];  // backup the function
-                        window['${selector}'] = function(...args) {// override the function
+                        const ${backupVar} = window['${selector}'];  // backup the function
+                        const hookFn = function(...args) {// override the function
                             console.info('[uBO] ${selector}:', args);
-                            // call the original function
-                            return typeof ${selector}Original === 'function' ? ${selector}Original.apply(this, args) : ${selector}Original;
+                            ${replacementCode}
                         };
+                        if (${writeProtect}) {// write-protect the replacement function by hooking the setter on the original variable
+                            try {
+                                Object.defineProperty(window, '${selector}', {
+                                    get() { return hookFn; },
+                                    set(newVal) {
+                                        console.info('[uBO Intercept] Prevented site from overwriting ${selector}');
+                                    },
+                                    configurable: true
+                                });
+                            } catch (e) {
+                                window['${selector}'] = hookFn;
+                            }
+                        } else {
+                            window['${selector}'] = hookFn;
+                        }
                         return;
                     }
-                    // Check top-level lexical variable (e.g., let calculateArea)
+                    // Handle top-level lexical variable, e.g. "let calculateArea"; cannot provide write-protect
                     if (typeof ${selector} !== 'undefined') {
-                        const ${selector}Original = ${selector};  // backup the function
+                        const ${backupVar} = ${selector};  // backup the function
                         ${selector} = function(...args) {// override the function
                             console.info('[uBO Intercept] ${selector}:', args);
-                            // call the original function
-                            return typeof ${selector}Original === 'function' ? ${selector}Original.apply(this, args) : ${selector}Original;
+                            ${replacementCode}
                         };
                     }
                 } catch(innerErr) {
