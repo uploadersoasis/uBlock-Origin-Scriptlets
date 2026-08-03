@@ -19,7 +19,7 @@ function overrideFunctionBody(selector) {
                     }
                     // Check top-level lexical variable (e.g., let calculateArea)
                     if (typeof ${selector} !== 'undefined') {
-                        const original = ${selector};  // backup the function
+                        const ${selector}Original = ${selector};  // backup the function
                         ${selector} = function(...args) {// override the function
                             console.info('[uBO Intercept] ${selector}:', args);
                             // call the original function
