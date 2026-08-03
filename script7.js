@@ -5,7 +5,7 @@
 function overrideletfunc(...args) {
     // Extract selector cleanly regardless of how uBO serialized arguments
     const selector = typeof args[0] === 'string' ? args[0].trim() : '';
-    if (!selector) { return; }
+    //if (!selector) { return; }
 
     const hook = () => {
         try {
