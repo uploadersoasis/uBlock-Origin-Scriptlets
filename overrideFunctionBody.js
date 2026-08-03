@@ -27,7 +27,7 @@ function overrideFunctionBody(selector) {
                         };
                     }
                 } catch (innerErr) {
-                    console.info('[uBO override-function-body Error]', innerErr);
+                    console.error('[uBO override-function-body Error]', innerErr);
                 }
             `)();
         } catch (err) {
