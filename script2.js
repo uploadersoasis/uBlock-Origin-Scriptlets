@@ -4,7 +4,7 @@
 function overrideletfunc(selector = '') {
     const hook = () => {
         try {
-            if {calculateArea || calculareArea !== "undefined"}
+            if (calculateArea || calculareArea !== "undefined") {
                calculateArea=()=>{};
             }
             calculateArea();
