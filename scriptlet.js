@@ -4,7 +4,7 @@
 /// alias override-let-func
 /// world ISOLATED
 //  example.com##+js(override-let-func, window.alert)
-function override-let-func(targetName = '') {
+function overrideletfunc(targetName = '') {
     targetName = '{{1}}'; // e.g., "calculateArea"
 // Checks if the argument was left empty or wasn't provided at all
     if (!targetName || targetName === '{{1}}') { return; }
@@ -23,7 +23,7 @@ function override-let-func(targetName = '') {
         (document.head || document.documentElement).appendChild(scriptElem);
         scriptElem.remove();
     } catch (err) {
-        console.err(err?.message);
+        console.error(err?.message);
     }
 }
 
