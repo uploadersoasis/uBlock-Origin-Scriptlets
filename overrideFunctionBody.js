@@ -21,7 +21,7 @@ function overrideFunctionBody(selector) {
                     if (typeof ${selector} !== 'undefined') {
                         const original = ${selector};  // backup the function 
                         ${selector} = function(...args) {// override the function
-                            console.log('[uBO Intercept] ${selector}:', args);
+                            console.info('[uBO Intercept] ${selector}:', args);
                             // call the original function
                             return typeof original === 'function' ? original.apply(this, args) : original;
                         };
