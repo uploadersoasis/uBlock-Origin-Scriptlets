@@ -1,8 +1,8 @@
-/// override-let-func.js
-/// alias override-let-func
+/// inject-script-tag.js
+/// alias inject-script-tag
 /// world MAIN
 /// dependency run-at.fn
-function overrideletfunc(selector, body) {
+function injectScriptTag(selector, body) {
     runAt(() => {
         try {
             const scriptElem = document.createElement('script');
@@ -15,5 +15,5 @@ function overrideletfunc(selector, body) {
         }
     }, 'idle');  // start, interactive, idle are the three choices
 }
-// example.com##+js(override-let-func, window.alert)
+// example.com##+js(inject-script-tag, window.alert)
 //'use strict';
