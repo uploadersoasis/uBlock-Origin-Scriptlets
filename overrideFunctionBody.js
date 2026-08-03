@@ -8,29 +8,29 @@ function overrideFunctionBody(selector) {
             new Function(`
                 try {
                     // Check window property (e.g., var calculateArea2)
-                    if (typeof window['${selector}'] !== 'undefined') {
-                        const original = window['${selector}'];  // backup the function
+                    if (typeof window['${selector}'] !== 'undefined') {// TODO: assumes selector is a single keyword
+                        const ${selector}Original = window['${selector}'];  // backup the function
                         window['${selector}'] = function(...args) {// override the function
                             console.info('[uBO] ${selector}:', args);
                             // call the original function
-                            return typeof original === 'function' ? original.apply(this, args) : original;
+                            return typeof ${selector}Original === 'function' ? ${selector}Original.apply(this, args) : ${selector}Original;
                         };
                         return;
                     }
                     // Check top-level lexical variable (e.g., let calculateArea)
                     if (typeof ${selector} !== 'undefined') {
-                        const original = ${selector};  // backup the function 
+                        const original = ${selector};  // backup the function
                         ${selector} = function(...args) {// override the function
                             console.info('[uBO Intercept] ${selector}:', args);
                             // call the original function
-                            return typeof original === 'function' ? original.apply(this, args) : original;
+                            return typeof ${selector}Original === 'function' ? ${selector}Original.apply(this, args) : ${selector}Original;
                         };
                     }
-                } catch (innerErr) {
+                } catch(innerErr) {
                     console.error('[uBO override-function-body Error]', innerErr);
                 }
             `)();
-        } catch (err) {
+        } catch(err) {
             console.error('[uBO override-function-body Error]', err);
         }
     };
