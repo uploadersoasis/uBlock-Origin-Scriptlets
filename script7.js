@@ -7,7 +7,7 @@ function overrideletfunc(selector = 'testing') {
             if (arguments) {
                console.info(`Argument 1 is ${arguments[0]}.`);
             }
-        } catch (err) {
+        } catch(err) {
             console.error('[uBO override-let-func]', err);
         }
     };
