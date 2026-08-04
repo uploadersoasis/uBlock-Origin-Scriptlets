@@ -16,6 +16,8 @@ function overrideFunctionBody(selector, ...extraArgs) {
             extraArgs.pop();  // remove the last argument
         }
     }
+    // Make sure that selector is a valid Javascript variable name by replacing invalid characters with an underscore.
+    selector = '${selector}'.replace(/[^a-zA-Z0-9_$]/g, '_')
     const backupVar = `${selector}Original`;
     // .join() always returns a string.
     // Treat all of extraArgs as the replacement body text string so putting the body in quotations is not required.
@@ -27,7 +29,7 @@ function overrideFunctionBody(selector, ...extraArgs) {
     // Unless saved to a globally scoped object or variable, the backup function can't be accessed or modified for reuse, and it will be lost if the replacement function gets overridden later by scripts used by the webpage to which this scriptlet is applied.
 	// backupVar is not returned (appended to replacementCode automatically) if rawReplacement is provided.
     const replacementCode = rawReplacement
-        ? rawReplacement.replace(/(?<=[\s;\,\{\}\[\]\(\)]|^)\<backup\>(?=[\s;\.\,\{\}\[\]\(\)]|$)/g, backupVar)
+        ? rawReplacement.replace(/(?<=[\s;\,\{\}\[\]\(\)\&\|]|^)\<backup\>(?=[\s;\.\,\{\}\[\]\(\)\&\|]|$)/g, backupVar)
         : `return typeof ${backupVar} === "function" ? ${backupVar}.apply(this, args) : ${backupVar};`;
     const applyHook = () => {
         try {// create the replacement function from a string of raw code
@@ -80,3 +82,7 @@ function overrideFunctionBody(selector, ...extraArgs) {
         applyHook();  // immediate attempt if inline scripts already executed
     }
 }
+// TODO: parse selector as a object property chain in dot and/or bracketed format.
+//       Assign/backup the original function to a globally scoped variable so it is available if the replacement function gets overridden.
+//       add native runat() support as the final parameters or make the function body string the last parameter?
+//function overrideFunctionBody(selector, writeProtect=true, runat="runat", when="loading},...extraArgs) {
