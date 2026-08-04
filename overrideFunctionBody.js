@@ -44,8 +44,14 @@ function overrideFunctionBody(selector, ...extraArgs) {
                         };
                         if (${writeProtect}) {// write-protect the replacement function by hooking the setter on the original variable
                             try {
+								// "writable: false" will cause an error on attempted value reassignment in strict execution mode
+								Object.defineProperty(window, '${selector}', {
+									value: hookFn,
+									writable: false,
+									configurable: false
+								});
                                 Object.defineProperty(window, '${selector}', {
-                                    get() { return hookFn; },
+                                    //get() { return hookFn; },
                                     set(newVal) {
                                         console.info('[uBO Intercept] Prevented site from overwriting ${selector}');
                                     },
@@ -66,11 +72,16 @@ function overrideFunctionBody(selector, ...extraArgs) {
                             console.info('[uBO Intercept] ${selector}:', args);
                             ${replacementCode}
                         };
-                    }
+						// since cannot write-protect, create a a mutation observer to reapply the override if the DOM changes.
+						const observer = new MutationObserver(() => {
+							applyHook();
+						});
+						observer.observe(document, { childList: true, subtree: true });
+					}
                 } catch(innerErr) {
                     console.error('[uBO override-function-body Error]', innerErr);
                 }
-            `)();
+            `)();  // execute Function() to create a function from the body string.
         } catch(err) {
             console.error('[uBO override-function-body Error]', err);
         }
