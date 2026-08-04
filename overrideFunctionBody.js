@@ -22,6 +22,7 @@ function overrideFunctionBody(selector, ...extraArgs) {
 	// .join() always returns a string.
 	// Treat all of extraArgs as the replacement body text string so putting the body in quotations is not required.
 	// Do NOT use quotations inside the function body text IF the text is enclosed in quotation marks for the parameter/uBlock Origin rule, e.g. firefox.localhost##+js(override-function-body, calculateArea, "console.log("It works!");", true), since that triggers "SyntaxError: unexpected token: identifier".
+	// Do NOT put braces around the function body text for the parameter/uBlock Origin rule since they are already included in the Function() text below.
 	const rawReplacement = extraArgs.join(',').trim();  // no need to escape commas since it strips them
 	// Substitute the generated backup variable name for the "<backup>" placeholder if it is contained in the replacement body.
 	// "<backup>" must be surrounded by a space, linefeed, or select Javascript syntax characters or be at the end or beginning of the body text.
