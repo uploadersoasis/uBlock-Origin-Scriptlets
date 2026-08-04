@@ -27,7 +27,7 @@ function overrideFunctionBody(selector, ...extraArgs) {
     // Unless saved to a globally scoped object or variable, the backup function can't be accessed or modified for reuse, and it will be lost if the replacement function gets overridden later by scripts used by the webpage to which this scriptlet is applied.
 	// backupVar is not returned (appended to replacementCode automatically) if rawReplacement is provided.
     const replacementCode = rawReplacement
-        ? rawReplacement.replace(/(?<=[\s;\,\{\}\[\]\(\)]|^)<backup>(?=[\s;\.\,\{\}\[\]\(\)]|$)/g, backupVar)
+        ? rawReplacement.replace(/(?<=[\s;\,\{\}\[\]\(\)]|^)\<backup\>(?=[\s;\.\,\{\}\[\]\(\)]|$)/g, backupVar)
         : `return typeof ${backupVar} === "function" ? ${backupVar}.apply(this, args) : ${backupVar};`;
     const applyHook = () => {
         try {// create the replacement function from a string of raw code
