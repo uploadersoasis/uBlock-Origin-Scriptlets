@@ -45,18 +45,23 @@ function overrideFunctionBody(selector, ...extraArgs) {
 						};
 						if (${writeProtect}) {// write-protect the replacement function by hooking the setter on the original variable
 							try {
-								// "writable: false" will cause an error on attempted value reassignment in strict execution mode
-								Object.defineProperty(window, '${selector}', {
+								// Must pick only one of the following Object.defineProperty() statements because a property can be either a Data Descriptor or an Accessor Descriptor NOT both.
+								// "writable: false" will cause an error on attempted value reassignment in "strict" execution mode.
+								/*
+								Object.defineProperty(window, '${selector}', {// Data Descriptor
 									value: hookFn,
+									enumerable: true,
 									writable: false,
-									configurable: false
+									configurable: true  // allows hooking to a different function later with a subsequent uBlock Origin rule; won't error on write.
 								});
-								Object.defineProperty(window, '${selector}', {
-									//get() { return hookFn; },
-									set(newVal) {
-										console.info('[uBO Intercept] Prevented site from overwriting ${selector}');
+								*/
+								Object.defineProperty(window, '${selector}', {// Accessor Descriptor
+									get() { return hookFn; },
+									set(newVal) {// ignores newVal so hookFn() remains the returned function of get()
+										console.info('[uBO Intercept] Prevented site from overwriting ${selector}.');
 									},
-									configurable: true
+									enumerable: true,
+									configurable: true  // allows hooking to a different function later with a subsequent uBlock Origin rule; won't error on write.
 								});
 							} catch (e) {
 								window['${selector}'] = hookFn;
